@@ -6,12 +6,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EasyFood.Controllers;
 
+/// <summary>Gestão de pedidos.</summary>
 [ApiController]
 [Route("api/pedidos")]
 [Authorize]
 public class PedidosController(IPedidoService pedidoService) : ControllerBase
 {
+    /// <summary>Cria um novo pedido para o usuário autenticado.</summary>
     [HttpPost]
+    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Criar([FromBody] CriarPedidoRequest request)
     {
         var usuarioId = ObterUsuarioId();
@@ -19,7 +24,12 @@ public class PedidosController(IPedidoService pedidoService) : ControllerBase
         return CreatedAtAction(nameof(ObterPorId), new { id = response.Id }, response);
     }
 
+    /// <summary>Obtém um pedido por ID. Admin vê qualquer pedido; Cliente vê apenas os seus.</summary>
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObterPorId(int id)
     {
         var usuarioId = ObterUsuarioId();
@@ -28,7 +38,10 @@ public class PedidosController(IPedidoService pedidoService) : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>Lista pedidos. Admin vê todos; Cliente vê apenas os seus.</summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<PedidoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Listar()
     {
         var usuarioId = ObterUsuarioId();
@@ -37,8 +50,14 @@ public class PedidosController(IPedidoService pedidoService) : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>Atualiza o status de um pedido. Requer role Admin.</summary>
     [HttpPatch("{id:int}/status")]
     [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(PedidoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> AtualizarStatus(int id, [FromBody] AtualizarStatusRequest request)
     {
         var response = await pedidoService.AtualizarStatusAsync(id, request);
