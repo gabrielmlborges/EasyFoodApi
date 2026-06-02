@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: easyfood_db
+    environment:
+      POSTGRES_USER: easyfood
+      POSTGRES_PASSWORD: easyfood123
+      POSTGRES_DB: easyfood
+    ports:
+      - "5432:5432"
+    volumes:
+      - easyfood_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  easyfood_pgdata:
