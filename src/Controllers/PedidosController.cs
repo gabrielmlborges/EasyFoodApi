@@ -38,15 +38,26 @@ public class PedidosController(IPedidoService pedidoService) : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>Lista pedidos. Admin vê todos; Cliente vê apenas os seus.</summary>
+    /// <summary>Lista os pedidos do usuário autenticado.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(List<PedidoResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Listar()
     {
         var usuarioId = ObterUsuarioId();
-        var isAdmin = User.IsInRole("Admin");
-        var response = await pedidoService.ListarAsync(usuarioId, isAdmin);
+        var response = await pedidoService.ListarAsync(usuarioId);
+        return Ok(response);
+    }
+
+    /// <summary>Lista todos os pedidos. Requer role Admin.</summary>
+    [HttpGet("todos")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(List<PedidoResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ListarTodos()
+    {
+        var response = await pedidoService.ListarTodosAsync();
         return Ok(response);
     }
 

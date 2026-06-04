@@ -14,6 +14,7 @@ public class ProdutoService(AppDbContext db) : IProdutoService
         {
             Nome = request.Nome,
             Descricao = request.Descricao,
+            UrlImagem = request.UrlImagem,
             Preco = request.Preco
         };
 
@@ -46,6 +47,7 @@ public class ProdutoService(AppDbContext db) : IProdutoService
 
         if (request.Nome is not null) produto.Nome = request.Nome;
         if (request.Descricao is not null) produto.Descricao = request.Descricao;
+        if (request.UrlImagem is not null) produto.UrlImagem = request.UrlImagem;
         if (request.Preco is not null) produto.Preco = request.Preco.Value;
         if (request.IsActive is not null) produto.IsActive = request.IsActive.Value;
 
@@ -55,5 +57,5 @@ public class ProdutoService(AppDbContext db) : IProdutoService
     }
 
     private static ProdutoResponse ToResponse(Produto p) =>
-        new(p.Id, p.Nome, p.Descricao, p.Preco, p.IsActive);
+        new(p.Id, p.Nome, p.Descricao, p.UrlImagem, p.Preco, p.IsActive);
 }

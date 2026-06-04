@@ -53,17 +53,23 @@ public class PedidoService(AppDbContext db) : IPedidoService
         return await CarregarPedidoResponse(id);
     }
 
-    public async Task<List<PedidoResponse>> ListarAsync(int usuarioId, bool isAdmin)
+    public async Task<List<PedidoResponse>> ListarAsync(int usuarioId)
     {
-        var query = db.Pedidos
+        var pedidos = await db.Pedidos
             .Include(p => p.PedidoProdutos)
             .ThenInclude(pp => pp.Produto)
-            .AsQueryable();
+            .Where(p => p.UsuarioId == usuarioId)
+            .ToListAsync();
 
-        if (!isAdmin)
-            query = query.Where(p => p.UsuarioId == usuarioId);
+        return pedidos.Select(MapearResponse).ToList();
+    }
 
-        var pedidos = await query.ToListAsync();
+    public async Task<List<PedidoResponse>> ListarTodosAsync()
+    {
+        var pedidos = await db.Pedidos
+            .Include(p => p.PedidoProdutos)
+            .ThenInclude(pp => pp.Produto)
+            .ToListAsync();
 
         return pedidos.Select(MapearResponse).ToList();
     }
