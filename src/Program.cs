@@ -11,7 +11,15 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter(
+                System.Text.Json.JsonNamingPolicy.CamelCase
+                )
+                );
+    });
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -39,19 +47,19 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title       = "EasyFood API",
-        Version     = "v1",
+        Title = "EasyFood API",
+        Version = "v1",
         Description = "API do sistema EasyFood — pedidos de comida online."
     });
 
     var jwtScheme = new OpenApiSecurityScheme
     {
-        Name         = "Authorization",
-        Type         = SecuritySchemeType.Http,
-        Scheme       = "bearer",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT",
-        In           = ParameterLocation.Header,
-        Description  = "Informe o token JWT obtido em POST /api/auth/login."
+        In = ParameterLocation.Header,
+        Description = "Informe o token JWT obtido em POST /api/auth/login."
     };
     options.AddSecurityDefinition("Bearer", jwtScheme);
 
@@ -67,9 +75,17 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
+var allowedOrigins = builder.Configuration["AllowedOrigins"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
 builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+    {
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+        else
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    }));
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
