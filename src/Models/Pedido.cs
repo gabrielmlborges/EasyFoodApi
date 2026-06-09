@@ -6,6 +6,8 @@ public class Pedido
     public int UsuarioId { get; set; }
     public StatusPedido Status { get; set; } = StatusPedido.Pendente;
     public decimal Total { get; set; }
+    public string EnderecoEntrega { get; set; } = null!;
+    public MetodoPagamento MetodoPagamento { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CriadoEm { get; set; }
     public DateTime AtualizadoEm { get; set; }
@@ -21,4 +23,11 @@ public enum StatusPedido
     EmPreparo,
     Entregue,
     Cancelado
+}
+
+public enum MetodoPagamento
+{
+    Cartao,
+    Dinheiro,
+    Pix
 }

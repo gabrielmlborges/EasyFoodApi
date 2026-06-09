@@ -5,6 +5,8 @@ public record PedidoResponse(
     int UsuarioId,
     string Status,
     decimal Total,
+    string EnderecoEntrega,
+    string MetodoPagamento,
     bool IsActive,
     DateTime CriadoEm,
     DateTime AtualizadoEm,

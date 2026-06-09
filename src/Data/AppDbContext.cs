@@ -26,6 +26,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Pedido>(e =>
         {
             e.Property(p => p.Status).HasConversion<string>();
+            e.Property(p => p.MetodoPagamento).HasConversion<string>();
             e.Property(p => p.Total).HasColumnType("numeric(10,2)");
         });
 

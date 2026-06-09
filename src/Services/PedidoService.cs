@@ -33,7 +33,9 @@ public class PedidoService(AppDbContext db) : IPedidoService
         {
             UsuarioId = usuarioId,
             PedidoProdutos = itens,
-            Total = itens.Sum(i => i.PrecoUnitario * i.Quantidade)
+            Total = itens.Sum(i => i.PrecoUnitario * i.Quantidade),
+            EnderecoEntrega = request.EnderecoEntrega,
+            MetodoPagamento = request.MetodoPagamento
         };
 
         db.Pedidos.Add(pedido);
@@ -104,6 +106,8 @@ public class PedidoService(AppDbContext db) : IPedidoService
             pedido.UsuarioId,
             pedido.Status.ToString(),
             pedido.Total,
+            pedido.EnderecoEntrega,
+            pedido.MetodoPagamento.ToString(),
             pedido.IsActive,
             pedido.CriadoEm,
             pedido.AtualizadoEm,
